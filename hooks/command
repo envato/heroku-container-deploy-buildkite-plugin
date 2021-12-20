@@ -176,7 +176,7 @@ function check_release() {
   do
     count=$((count + 1))
 
-    local latest_release; latest_release=$(curl -sf -X GET "https://api.heroku.com/apps/$app/releases" \
+    local latest_release; latest_release=$(curl -sf "https://api.heroku.com/apps/$app/releases" \
       -H "Content-Type: application/json" \
       -H "Accept: application/vnd.heroku+json; version=3" \
       -H "Range: version ..; max=1, order=desc" \
@@ -191,9 +191,16 @@ function check_release() {
     if [ $streamed -eq 0 ] && [ "$status" == "pending" ] && [ "$output_stream_url" != "null" ]; then
       streamed=1
       echo "$summary releasing..."
-      echo curl -sf -X GET "$output_stream_url"
-      curl -sf -X GET "$output_stream_url"
-      continue;
+      status=0
+      if ! retry 3 curl -sf -N "$output_stream_url"; then
+        status=$((status + 1))
+      fi
+      if [ $status -eq 0 ]; then
+        continue;
+      else
+        echo "Failed streaming release output: $output_stream_url"
+        exit 1
+      fi
     fi
 
     if [ "$status" == "succeeded" ] && [ "$current" == "true" ]; then
