@@ -9,9 +9,9 @@ steps:
       - envato/heroku-container-deploy:
           app: my-app
           process-types:
-            - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo/heroku-web-${BUILDKITE_COMMIT}
-            - worker:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo/heroku-worker-${BUILDKITE_COMMIT}
-            - release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo/heroku-release-${BUILDKITE_COMMIT}
+            - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
+            - worker:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker-${BUILDKITE_COMMIT}
+            - release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release-${BUILDKITE_COMMIT}
 ```
 
 ## Configuration
@@ -20,9 +20,13 @@ steps:
 
 Heroku app name
 
-### `process-types` (string)
+### `process-types` (Array of string)
 
-Registry location of the tagged image
+List of process types and their image repository to deploy.
+
+```
+<proc-type>:<repo>:<tag>
+```
 
 ## Developing
 

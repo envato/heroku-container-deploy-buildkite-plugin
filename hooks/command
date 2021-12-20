@@ -64,15 +64,15 @@ function get_proc_type_image_tag() {
 ## Pulling from owner container repo
 ##
 
-function pull_prebuilt_images() {
-  local proc_type=$1
-  local proc_type_image=$2
-  local proc_type_image_id
+for line in $process_types; do
+  IFS=':' read -r -a tokens <<< "$line"
+  proc_type=${tokens[0]}
+  proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_image_id=$(docker images -q "$proc_type_image")
 
   echo "~~~ :docker: Pulling $proc_type image"
   if [ -z "${proc_type_image_id}" ]; then
-    local status=0
+    status=0
     if ! retry 3 docker pull "$proc_type_image"; then
       status=$((status + 1))
     fi
@@ -85,7 +85,7 @@ function pull_prebuilt_images() {
   else
     echo "Found $proc_type_image"
   fi
-}
+done
 
 ##
 ## Tagging for heroku
@@ -93,22 +93,13 @@ function pull_prebuilt_images() {
 
 for line in $process_types; do
   IFS=':' read -r -a tokens <<< "$line"
-  pull_prebuilt_images "${tokens[@]}"
-done
-
-function tag_heroku_images() {
-  local proc_type=$1
-  local proc_type_image=$2
-  local proc_type_tag; proc_type_tag=$(get_proc_type_image_tag "$proc_type")
+  proc_type=${tokens[0]}
+  proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
+  proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
   echo "~~~ :heroku: Tagging ${proc_type}"
   docker tag "$proc_type_image" "$proc_type_tag"
   echo "Tagged $proc_type_image as $proc_type_tag"
-}
-
-for line in $process_types; do
-  IFS=':' read -r -a tokens <<< "$line"
-  tag_heroku_images "${tokens[@]}"
 done
 
 ##
@@ -118,13 +109,14 @@ done
 echo "~~~ :heroku: Logging into Heroku Docker Registry"
 echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
 
-function push_heroku_images() {
-  local proc_type=$1
-  local proc_type_image=$2
-  local proc_type_tag; proc_type_tag=$(get_proc_type_image_tag "$proc_type")
+for line in $process_types; do
+  IFS=':' read -r -a tokens <<< "$line"
+  proc_type=${tokens[0]}
+  proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
+  proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
   echo "~~~ :heroku: Pushing ${proc_type}"
-  local status=0
+  status=0
   if ! retry 3 docker push "$proc_type_tag"; then
     status=$((status + 1))
   fi
@@ -134,11 +126,6 @@ function push_heroku_images() {
     echo "Failed push $proc_type_tag"
     exit 1
   fi
-}
-
-for line in $process_types; do
-  IFS=':' read -r -a tokens <<< "$line"
-  push_heroku_images "${tokens[@]}"
 done
 
 ##
@@ -146,34 +133,25 @@ done
 ##
 
 proc_type_names=()
-function get_proc_names() {
-  local proc_type=$1
-  proc_type_names+=("$proc_type")
-}
-
 for line in $process_types; do
   IFS=':' read -r -a tokens <<< "$line"
-  get_proc_names "${tokens[@]}"
+  proc_type=${tokens[0]}
+  proc_type_names+=("$proc_type")
 done
-
 
 echo "~~~ :heroku: Releasing ${proc_type_names[*]}"
 
 updates=()
 
-function get_release_updates() {
-  local proc_type=$1
-  local proc_type_image=$2
-  local proc_type_tag; proc_type_tag=$(get_proc_type_image_tag "$proc_type")
-  local image_id; image_id=$(docker inspect "$proc_type_tag" --format={{.Id}})
+for line in $process_types; do
+  IFS=':' read -r -a tokens <<< "$line"
+  proc_type=${tokens[0]}
+  proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
+  proc_type_tag=$(get_proc_type_image_tag "$proc_type")
+  image_id=$(docker inspect "$proc_type_tag" --format={{.Id}})
 
   echo "Inspected $proc_type_tag identified as $image_id"
   updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
-}
-
-for line in $process_types; do
-  IFS=':' read -r -a tokens <<< "$line"
-  get_release_updates "${tokens[@]}"
 done
 
 payload=$(join_by , "${updates[@]}")
