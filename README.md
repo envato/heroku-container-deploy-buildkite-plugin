@@ -1,5 +1,3 @@
-Development in progress
-
 # Heroku Container Deploy
 
 ## Example
