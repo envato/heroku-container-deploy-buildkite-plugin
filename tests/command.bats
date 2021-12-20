@@ -197,7 +197,7 @@ load '/usr/local/lib/bats/load.bash'
   stub curl \
     '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
     '-sf -X GET https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false,\"output_stream_url\":\"release_output_stream_url\"\}\]' \
-    '-sf -X GET release_output_stream_url : echo "Release Output"' \
+    '-sf -X GET release_output_stream_url -H "Authorization: Bearer api-token" : echo "Release Output"' \
     '-sf -X GET https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false,\"output_stream_url\":\"release_output_stream_url\"\}\]' \
     '-sf -X GET https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"succeeded\",\"current\":true,\"output_stream_url\":\"release_output_stream_url\"\}\]'
 

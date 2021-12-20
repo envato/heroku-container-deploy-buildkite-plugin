@@ -4,7 +4,7 @@ set -ue
 
 retry_sleep=$((${RETRY_SLEEP:-2} + 0))
 
-if [ -z ${HEROKU_API_KEY:-} ]; then
+if [ -z "${HEROKU_API_KEY:-}" ]; then
   echo "Missing required HEROKU_API_KEY"
   exit 1
 fi
@@ -164,10 +164,10 @@ curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
   -H "Authorization: Bearer ${HEROKU_API_KEY:-}"
 
+echo ""
 echo "Verifying release"
 
 version=""
-
 
 function check_release() {
   local count=0
@@ -191,7 +191,8 @@ function check_release() {
     if [ $streamed -eq 0 ] && [ "$status" == "pending" ] && [ "$output_stream_url" != "null" ]; then
       streamed=1
       echo "$summary releasing..."
-      curl -sf -X GET "$output_stream_url"
+      curl -sf -X GET "$output_stream_url" \
+        -H "Authorization: Bearer ${HEROKU_API_KEY:-}"
       continue;
     fi
 
