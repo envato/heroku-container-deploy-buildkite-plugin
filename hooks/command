@@ -191,8 +191,8 @@ function check_release() {
     if [ $streamed -eq 0 ] && [ "$status" == "pending" ] && [ "$output_stream_url" != "null" ]; then
       streamed=1
       echo "$summary releasing..."
-      curl -sf -X GET "$output_stream_url" \
-        -H "Authorization: Bearer ${HEROKU_API_KEY:-}"
+      echo curl -sf -X GET "$output_stream_url"
+      curl -sf -X GET "$output_stream_url"
       continue;
     fi
 
