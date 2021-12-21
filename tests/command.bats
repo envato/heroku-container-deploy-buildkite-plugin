@@ -26,7 +26,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : echo release_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"succeeded\",\"current\":true\}\]'
 
   run "$PWD/hooks/command"
@@ -66,7 +66,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : echo release_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"succeeded\",\"current\":true\}\]'
 
   run "$PWD/hooks/command"
@@ -101,7 +101,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"succeeded\",\"current\":true\}\]'
 
   run "$PWD/hooks/command"
@@ -131,7 +131,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false\}\]' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false\}\]' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"succeeded\",\"current\":true\}\]'
@@ -163,7 +163,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false\}\]' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false\}\]' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"failed\",\"current\":false\}\]'
@@ -195,7 +195,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : echo release_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 0' \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false,\"output_stream_url\":\"release_output_stream_url\"\}\]' \
     '-sf release_output_stream_url -H "Accept: text/event-stream" : echo "id: 1" && echo "data: Release Output"' \
     '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"pending\",\"current\":false,\"output_stream_url\":\"release_output_stream_url\"\}\]' \
@@ -318,7 +318,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : exit 1"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 1'
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 1'
 
   run "$PWD/hooks/command"
 
@@ -356,7 +356,7 @@ load '/usr/local/lib/bats/load.bash'
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : echo release_id"
 
   stub curl \
-    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" : exit 1'
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\,\{\"type\"\:\"release\"\,\"docker_image\"\:\"release_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 1'
 
   run "$PWD/hooks/command"
 

@@ -164,7 +164,8 @@ curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -d "{\"updates\":[$payload]}" \
   -H "Content-Type: application/json" \
   -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
-  -H "Authorization: Bearer ${HEROKU_API_KEY:-}"
+  -H "Authorization: Bearer ${HEROKU_API_KEY:-}" \
+  -o /dev/null
 
 echo ""
 echo "Verifying release"
