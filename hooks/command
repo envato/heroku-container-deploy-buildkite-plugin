@@ -227,7 +227,7 @@ function check_release() {
     fi
 
     echo "$summary waiting..."
-    sleep $retry_sleep;
+    sleep "$retry_sleep";
   done
 }
 
