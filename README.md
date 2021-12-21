@@ -76,9 +76,3 @@ Linting
 ```shell
 docker-compose run --rm lint
 ```
-
-Shellcheck
-
-```shell
-docker-compose run --rm shellcheck
-```
