@@ -168,7 +168,6 @@ curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -o /dev/null
 
 echo ""
-echo "Verifying release"
 
 version=""
 
