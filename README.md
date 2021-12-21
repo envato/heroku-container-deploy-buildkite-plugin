@@ -2,6 +2,10 @@
 
 Deploy pre-built docker images, typically with [docker-compose-buildkite-plugin](https://github.com/buildkite-plugins/docker-compose-buildkite-plugin), to using the Heroku Container Registry. It follows the official recommended steps [for Docker deploys on Heroku](https://devcenter.heroku.com/articles/container-registry-and-runtime). See [ecr-buildkite-plugin](https://github.com/buildkite-plugins/ecr-buildkite-plugin) for authenticating with AWS ECR.
 
+## Design Decision
+
+[Heroku API](https://devcenter.heroku.com/articles/container-registry-and-runtime#api) is favoured over depending on the Heroku CLI. This helps to avoid problems with transitive npm dependencies causing CI blockage at scale.
+
 ## Example
 
 Deploy a pre-built images from ECR to heroku container registry.
