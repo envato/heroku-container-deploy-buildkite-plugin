@@ -52,15 +52,15 @@ retry() {
   return 0
 }
 
-app=$(plugin_read_list APP)
-process_types=$(plugin_read_list PROCESS_TYPES)
-
 function get_proc_type_image_tag() {
   echo "registry.heroku.com/$app/$1:latest"
 }
 
+app=$(plugin_read_list APP)
+process_types=$(plugin_read_list PROCESS_TYPES)
+
 ##
-## Pulling from owner container repo
+## Pulling from owner container registry
 ##
 
 for line in $process_types; do
@@ -87,7 +87,7 @@ for line in $process_types; do
 done
 
 ##
-## Tagging for heroku
+## Tagging for heroku container registry
 ##
 
 for line in $process_types; do
@@ -96,13 +96,13 @@ for line in $process_types; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
-  echo "~~~ :heroku: Tagging ${proc_type}"
+  echo "~~~ :heroku: Tagging ${proc_type} image"
   docker tag "$proc_type_image" "$proc_type_tag"
   echo "Tagged $proc_type_image as $proc_type_tag"
 done
 
 ##
-## Pushing to heroku
+## Pushing to heroku container registry
 ##
 
 echo "~~~ :heroku: Logging into Heroku Docker Registry"
@@ -114,7 +114,7 @@ for line in $process_types; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
-  echo "~~~ :heroku: Pushing ${proc_type}"
+  echo "~~~ :heroku: Pushing ${proc_type} image"
   status=0
   if ! retry 3 docker push "$proc_type_tag"; then
     status=$((status + 1))
@@ -128,7 +128,7 @@ for line in $process_types; do
 done
 
 ##
-## Releasing to heroku
+## Releasing to heroku platform
 ##
 
 proc_type_names=()
@@ -147,6 +147,7 @@ for line in $process_types; do
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
+  # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
   image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
 
   echo "Inspected $proc_type_tag identified as $image_id"
@@ -157,6 +158,8 @@ payload=$(join_by , "${updates[@]}")
 
 echo "Updating formation"
 
+# Run the equivalant Heroku API as with the cli `heroku container:release`
+# Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#api
 curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -d "{\"updates\":[$payload]}" \
   -H "Content-Type: application/json" \
@@ -175,6 +178,8 @@ function check_release() {
   do
     count=$((count + 1))
 
+    # Get the most recent release data from the Heroku API
+    # Based on https://github.com/heroku/cli/blob/960d10a4816d8d1215fb8e4b7bf5499a6c0c76c7/packages/container-registry-v5/commands/release.js#L86-L90
     local latest_release; latest_release=$(curl -sf "https://api.heroku.com/apps/$app/releases" \
       -H "Content-Type: application/json" \
       -H "Accept: application/vnd.heroku+json; version=3" \
@@ -188,9 +193,13 @@ function check_release() {
     local summary; summary="[heroku version=$version, current=$current, status=$status]"
 
     if [ $streamed -eq 0 ] && [ "$status" == "pending" ] && [ "$output_stream_url" != "null" ]; then
+      # Prints the output stream to the current logs
+      # Based on https://github.com/heroku/cli/blob/960d10a4816d8d1215fb8e4b7bf5499a6c0c76c7/packages/container-registry-v5/commands/release.js#L99-L100
       streamed=1
       echo "$summary releasing..."
       status=0
+      # Retry necessary because this will 404 until it's eventually consistent
+      # Based on https://github.com/heroku/cli/blob/960d10a4816d8d1215fb8e4b7bf5499a6c0c76c7/packages/container-registry-v5/lib/streamer.js#L15
       if ! retry 3 curl -sf "$output_stream_url" -H "Accept: text/event-stream" | grep -e "^data:"; then
         status=$((status + 1))
       fi
@@ -224,4 +233,4 @@ function check_release() {
 
 check_release
 
-echo "Version $version is current :rocket:"
+echo "Version $version is current."
