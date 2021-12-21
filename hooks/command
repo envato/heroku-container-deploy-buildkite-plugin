@@ -9,7 +9,6 @@ if [ -z "${HEROKU_API_KEY:-}" ]; then
   exit 1
 fi
 
-
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
 function plugin_read_list() {
@@ -192,7 +191,7 @@ function check_release() {
       streamed=1
       echo "$summary releasing..."
       status=0
-      if ! retry 3 curl -sf -N --verbose "$output_stream_url" -H "Accept: text/event-stream"; then
+      if ! retry 3 curl -sf "$output_stream_url" -H "Accept: text/event-stream" | grep -e "^data:"; then
         status=$((status + 1))
       fi
       if [ $status -eq 0 ]; then
