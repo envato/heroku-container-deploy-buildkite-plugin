@@ -192,7 +192,7 @@ function check_release() {
       streamed=1
       echo "$summary releasing..."
       status=0
-      if ! retry 3 curl -sf -N "$output_stream_url"; then
+      if ! retry 3 curl -sf -N --verbose "$output_stream_url" -H "Accept: text/event-stream"; then
         status=$((status + 1))
       fi
       if [ $status -eq 0 ]; then
