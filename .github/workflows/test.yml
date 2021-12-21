@@ -10,7 +10,7 @@ jobs:
       volumes:
         - "${{github.workspace}}:/plugin"
     steps:
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: tests
         run: bats tests/
   plugin-lint:
