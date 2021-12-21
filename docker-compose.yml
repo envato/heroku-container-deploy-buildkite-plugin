@@ -4,7 +4,14 @@ services:
     command: ["--id", "envato/heroku-container-deploy"]
     volumes:
       - ".:/plugin:ro"
+
   tests:
     image: buildkite/plugin-tester
     volumes:
       - ".:/plugin:ro"
+
+  shellcheck:
+    image: koalaman/shellcheck:stable
+    command: ["hooks/command"]
+    volumes:
+      - ".:/mnt"

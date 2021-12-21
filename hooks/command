@@ -147,7 +147,7 @@ for line in $process_types; do
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
-  image_id=$(docker inspect "$proc_type_tag" --format={{.Id}})
+  image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
 
   echo "Inspected $proc_type_tag identified as $image_id"
   updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
