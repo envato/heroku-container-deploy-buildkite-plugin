@@ -1,0 +1,15 @@
+name: Heroku Container Deploy
+description: Deploys prebuilt container images to Heroku
+author: https://github.com/envato/heroku-container-deploy-buildkite-plugin
+requirements:
+  - docker
+  - curl
+  - jq
+configuration:
+  properties:
+    app:
+      type: string
+    process-types:
+      type: [string, array]
+      minimum: 1
+  additionalProperties: false
