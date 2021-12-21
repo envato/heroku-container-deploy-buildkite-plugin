@@ -14,7 +14,7 @@ Deploy a pre-built images from ECR to heroku container registry.
 steps:
   - label: ":heroku: Deploy my-app app (web)"
     plugins:
-      - envato/heroku-container-deploy:
+      - envato/heroku-container-deploy#v1.0.0:
           app: my-app
           process-types:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
@@ -26,7 +26,7 @@ Deploy multiple pre-built images from ECR to heroku container registry.
 steps:
   - label: ":heroku: Deploy my-app app (web and worker)"
     plugins:
-      - envato/heroku-container-deploy:
+      - envato/heroku-container-deploy#v1.0.0:
           app: my-app
           process-types:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
@@ -39,7 +39,7 @@ Deploy multiple pre-built images including a [Release Phase](https://devcenter.h
 steps:
   - label: ":heroku: Deploy my-app app (web, worker and release)"
     plugins:
-      - envato/heroku-container-deploy:
+      - envato/heroku-container-deploy#v1.0.0:
           app: my-app
           process-types:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
@@ -75,4 +75,10 @@ Linting
 
 ```shell
 docker-compose run --rm lint
+```
+
+Shellcheck
+
+```shell
+docker-compose run --rm shellcheck
 ```
