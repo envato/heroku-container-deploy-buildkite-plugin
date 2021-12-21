@@ -2,7 +2,7 @@
 
 set -ue
 
-retry_sleep=$((${RETRY_SLEEP:-2} + 0))
+retry_sleep=${RETRY_SLEEP:-2}
 
 if [ -z "${HEROKU_API_KEY:-}" ]; then
   echo "Missing required HEROKU_API_KEY"
@@ -138,7 +138,7 @@ for line in $process_types; do
   proc_type_names+=("$proc_type")
 done
 
-echo "~~~ :heroku: Releasing ${proc_type_names[*]}"
+echo "+++ :heroku: Releasing ${proc_type_names[*]}"
 
 updates=()
 
