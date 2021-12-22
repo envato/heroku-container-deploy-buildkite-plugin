@@ -135,6 +135,7 @@ load '/usr/local/lib/bats/load.bash'
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/migrations:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
+    "inspect registry.heroku.com/my-app/migrations:latest --format={{.Id}} : echo migrations_id"
 
   stub curl \
     '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
@@ -152,7 +153,7 @@ load '/usr/local/lib/bats/load.bash'
   assert_output --partial "Pushed registry.heroku.com/my-app/web:latest"
   assert_output --partial "Pushed registry.heroku.com/my-app/migrations:latest"
   assert_output --partial "Inspected registry.heroku.com/my-app/web:latest identified as web_id"
-  refute_output --partial "Inspected registry.heroku.com/my-app/migrations:latest"
+  assert_output --partial "Inspected registry.heroku.com/my-app/migrations:latest identified as migrations_id"
   assert_output --partial "Version 100 is current"
 
   unstub docker
@@ -170,6 +171,7 @@ load '/usr/local/lib/bats/load.bash'
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations registry.heroku.com/my-app/migrations:latest : exit 0" \
     "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/migrations:latest : exit 0" \
+    "inspect registry.heroku.com/my-app/migrations:latest --format={{.Id}} : echo migrations_id"
 
   run "$PWD/hooks/command"
 
@@ -177,7 +179,7 @@ load '/usr/local/lib/bats/load.bash'
   assert_output --partial "Found XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations"
   assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations as registry.heroku.com/my-app/migrations:latest"
   assert_output --partial "Pushed registry.heroku.com/my-app/migrations:latest"
-  refute_output --partial "Inspected registry.heroku.com/my-app/migrations:latest"
+  assert_output --partial "Inspected registry.heroku.com/my-app/migrations:latest identified as migrations_id"
   refute_output --partial "Version 100 is current"
 
   unstub docker

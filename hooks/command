@@ -150,12 +150,12 @@ for line in $process_types; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
+  # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
+  image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
+  echo "Inspected $proc_type_tag identified as $image_id"
+
   # shellcheck disable=SC2076
   if [[ ! " ${skip_release_types[*]} " =~ " ${proc_type} " ]]; then
-    # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
-    image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
-
-    echo "Inspected $proc_type_tag identified as $image_id"
     updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
   fi
 done
