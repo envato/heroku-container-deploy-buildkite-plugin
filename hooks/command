@@ -137,7 +137,11 @@ proc_type_names=()
 for line in $process_types; do
   IFS=':' read -r -a tokens <<< "$line"
   proc_type=${tokens[0]}
-  proc_type_names+=("$proc_type")
+
+  # shellcheck disable=SC2076
+  if [[ ! " ${skip_release_types[*]} " =~ " ${proc_type} " ]]; then
+    proc_type_names+=("$proc_type")
+  fi
 done
 
 echo "+++ :heroku: Releasing ${proc_type_names[*]}"
@@ -152,11 +156,13 @@ for line in $process_types; do
 
   # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
   image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
-  echo "Inspected $proc_type_tag identified as $image_id"
 
   # shellcheck disable=SC2076
   if [[ ! " ${skip_release_types[*]} " =~ " ${proc_type} " ]]; then
+    echo "Inspected $proc_type_tag identified as $image_id"
     updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
+  else
+    echo "Skipping inspected $proc_type_tag identified as $image_id"
   fi
 done
 
