@@ -161,7 +161,7 @@ for line in $process_types; do
 done
 
 if [ ${#updates[@]} -eq 0 ]; then
-  echo "There are no images to release"
+  echo "There aren't images to release"
   exit 0
 fi
 

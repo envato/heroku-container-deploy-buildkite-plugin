@@ -180,6 +180,7 @@ load '/usr/local/lib/bats/load.bash'
   assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations as registry.heroku.com/my-app/migrations:latest"
   assert_output --partial "Pushed registry.heroku.com/my-app/migrations:latest"
   assert_output --partial "Inspected registry.heroku.com/my-app/migrations:latest identified as migrations_id"
+  assert_output --partial "There aren't images to release"
   refute_output --partial "Version 100 is current"
 
   unstub docker
