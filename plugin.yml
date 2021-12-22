@@ -12,6 +12,6 @@ configuration:
     process-types:
       type: [string, array]
       minimum: 1
-    skip-release:
+    skip-release-types:
       type: [string, array]
   additionalProperties: false
