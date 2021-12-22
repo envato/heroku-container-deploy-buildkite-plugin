@@ -58,6 +58,8 @@ function get_proc_type_image_tag() {
 
 app=$(plugin_read_list APP)
 process_types=$(plugin_read_list PROCESS_TYPES)
+skip_release_types=$(plugin_read_list SKIP_RELEASE_TYPES)
+
 
 ##
 ## Pulling from owner container registry
@@ -147,12 +149,21 @@ for line in $process_types; do
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
-  # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
-  image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
 
-  echo "Inspected $proc_type_tag identified as $image_id"
-  updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
+  # shellcheck disable=SC2076
+  if [[ ! " ${skip_release_types[*]} " =~ " ${proc_type} " ]]; then
+    # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
+    image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
+
+    echo "Inspected $proc_type_tag identified as $image_id"
+    updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
+  fi
 done
+
+if [ ${#updates[@]} -eq 0 ]; then
+  echo "There are no images to release"
+  exit 0
+fi
 
 payload=$(join_by , "${updates[@]}")
 
@@ -166,8 +177,6 @@ curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
   -H "Authorization: Bearer ${HEROKU_API_KEY:-}" \
   -o /dev/null
-
-echo ""
 
 version=""
 

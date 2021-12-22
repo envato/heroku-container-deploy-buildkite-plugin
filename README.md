@@ -63,6 +63,10 @@ List of process types and their image repository to deploy.
 <proc-type>:<ecr>:<tag>
 ```
 
+### `skip-release-types` (Optional, Array of string)
+
+List of process type names to skip releasing. It will pull, tag and push these images, but it won't patch the Heroku Formation API with these image ids.
+
 ## Developing
 
 Testing
