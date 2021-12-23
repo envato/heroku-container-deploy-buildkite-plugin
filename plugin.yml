@@ -12,6 +12,9 @@ configuration:
     process-types:
       type: [string, array]
       minimum: 1
-    skip-release-types:
+    process-type-images:
+      type: [string, array]
+      minimum: 1
+    releasing:
       type: [string, array]
   additionalProperties: false

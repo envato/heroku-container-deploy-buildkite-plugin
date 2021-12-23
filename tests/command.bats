@@ -120,7 +120,7 @@ load '/usr/local/lib/bats/load.bash'
 @test "Supports skipping formation patch per proc type" {
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPES_1="migrations:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations"
-  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_SKIP_RELEASE_TYPES_0=migrations
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_RELEASING=web
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
   export HEROKU_API_KEY=api-token
 
@@ -162,7 +162,7 @@ load '/usr/local/lib/bats/load.bash'
 
 @test "Exits gracefully if all proc types are skipped" {
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPES="migrations:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations"
-  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_SKIP_RELEASE_TYPES=migrations
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_RELEASING=web
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
   export HEROKU_API_KEY=api-token
 
