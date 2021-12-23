@@ -16,7 +16,7 @@ steps:
     plugins:
       - envato/heroku-container-deploy#v1.0.0:
           app: my-app
-          process-types:
+          process-type-images:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
 ```
 
@@ -28,7 +28,7 @@ steps:
     plugins:
       - envato/heroku-container-deploy#v1.0.0:
           app: my-app
-          process-types:
+          process-type-images:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
             - worker:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker-${BUILDKITE_COMMIT}
 ```
@@ -41,7 +41,7 @@ steps:
     plugins:
       - envato/heroku-container-deploy#v1.0.0:
           app: my-app
-          process-types:
+          process-type-images:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
             - worker:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker-${BUILDKITE_COMMIT}
             - release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release-${BUILDKITE_COMMIT}
@@ -55,7 +55,7 @@ Ensure that you have an `HEROKU_API_KEY` environment variable configured for you
 
 Heroku app name
 
-### `process-types` (Required, Array of string)
+### `process-type-images` (Required, Array of string)
 
 List of process types and their image repository to deploy.
 
@@ -63,9 +63,11 @@ List of process types and their image repository to deploy.
 <proc-type>:<ecr>:<tag>
 ```
 
-### `skip-release-types` (Optional, Array of string)
+### `releasing` (Optional, Array of string)
 
-List of process type names to skip releasing. It will pull, tag and push these images, but it won't patch the Heroku Formation API with these image ids.
+List of process type names to be released. It will allays pull, tag and push all images, but it will only patch the Heroku Formation API with these images.
+
+Default: All process types in `process-type-images`
 
 ## Developing
 
