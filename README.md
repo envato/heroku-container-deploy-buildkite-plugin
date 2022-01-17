@@ -67,7 +67,7 @@ List of process types and their image repository to deploy.
 
 List of process type names to be released. It will allays pull, tag and push all images, but it will only patch the Heroku Formation API with these images.
 
-Default: All process types in `process-type-images`
+Default: All process types in `process-type-images` except one named `migrations`
 
 ## Developing
 

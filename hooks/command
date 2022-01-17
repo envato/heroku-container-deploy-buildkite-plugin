@@ -86,7 +86,10 @@ fi
 if [ ${#releasing[@]} -eq 0 ]; then
   for line in "${process_type_images[@]}"; do
     IFS=':' read -r -a tokens <<< "$line"
-    releasing+=("${tokens[0]}")
+    # Exclude an image called migrations by default
+    if [ "${tokens[0]}" != "migrations" ]; then
+      releasing+=("${tokens[0]}")
+    fi
   done
 fi
 

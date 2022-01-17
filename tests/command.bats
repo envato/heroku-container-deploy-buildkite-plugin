@@ -227,6 +227,48 @@ load '/usr/local/lib/bats/load.bash'
   unstub docker
 }
 
+@test "Skips formation patch for migrations proc type by default" {
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_1="migrations:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations"
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
+  export HEROKU_API_KEY=api-token
+
+  stub docker \
+    "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
+    "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
+    "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations : exit 0" \
+    "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations : exit 0" \
+    "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
+    "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations registry.heroku.com/my-app/migrations:latest : exit 0" \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
+    "push registry.heroku.com/my-app/web:latest : exit 0" \
+    "push registry.heroku.com/my-app/migrations:latest : exit 0" \
+    "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
+    "inspect registry.heroku.com/my-app/migrations:latest --format={{.Id}} : echo migrations_id"
+
+  stub curl \
+    '-sf -X PATCH https://api.heroku.com/apps/my-app/formation -d \{\"updates\"\:\[\{\"type\"\:\"web\"\,\"docker_image\"\:\"web_id\"\}\]\} -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3.docker-releases" -H "Authorization: Bearer api-token" -o /dev/null : exit 0' \
+    '-sf https://api.heroku.com/apps/my-app/releases -H "Content-Type: application/json" -H "Accept: application/vnd.heroku+json; version=3" -H "Range: version ..; max=1, order=desc" -H "Authorization: Bearer api-token" : echo \[\{\"version\":100,\"status\"\:\"succeeded\",\"current\":true\}\]'
+
+  run "$PWD/hooks/command"
+
+  assert_success
+  assert_output --partial "Pulled XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
+  assert_output --partial "Pulled XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations"
+  refute_output --partial "Found XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
+  refute_output --partial "Found XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations"
+  assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web as registry.heroku.com/my-app/web:latest"
+  assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations as registry.heroku.com/my-app/migrations:latest"
+  assert_output --partial "Pushed registry.heroku.com/my-app/web:latest"
+  assert_output --partial "Pushed registry.heroku.com/my-app/migrations:latest"
+  assert_output --partial "Inspected registry.heroku.com/my-app/web:latest identified as web_id"
+  assert_output --partial "Skipping inspected registry.heroku.com/my-app/migrations:latest identified as migrations_id"
+  assert_output --partial "Version 100 is current"
+
+  unstub docker
+  unstub curl
+}
+
 @test "Polls heroku releases, until success" {
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
