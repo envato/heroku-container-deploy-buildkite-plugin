@@ -148,7 +148,7 @@ for line in "${process_type_images[@]}"; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
-  echo "~~~ :heroku: Pushing ${proc_type} image"
+  echo "~~~ :heroku: Pushing $app/$proc_type image"
   status=0
   if ! retry 3 docker push "$proc_type_tag"; then
     status=$((status + 1))
@@ -165,7 +165,7 @@ done
 ## Releasing to heroku platform
 ##
 
-echo "+++ :heroku: Releasing ${releasing[*]}"
+echo "+++ :heroku: Releasing ${releasing[*]} for $app"
 
 updates=()
 
