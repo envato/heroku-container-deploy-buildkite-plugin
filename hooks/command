@@ -226,6 +226,7 @@ function check_release() {
     local current; current=$(echo "$latest_release" | jq -r '.[0].current')
     local status; status=$(echo "$latest_release" | jq -r '.[0].status')
     local output_stream_url; output_stream_url=$(echo "$latest_release" | jq -r '.[0].output_stream_url')
+    local release_id; release_id=$(echo "$latest_release" | jq -r '.[0].id')
     local summary; summary="[heroku version=$version, current=$current, status=$status]"
 
     if [ $streamed -eq 0 ] && [ "$status" == "pending" ] && [ "$output_stream_url" != "null" ]; then
@@ -242,8 +243,9 @@ function check_release() {
       if [ $status -eq 0 ]; then
         continue;
       else
-        echo "Failed streaming release output: $output_stream_url"
-        exit 1
+        echo "Continuing without streaming release output, url: $output_stream_url"
+        echo "--> You can view the release logs in the heroku dashboard."
+        echo "--> https://dashboard.heroku.com/apps/$app/activity/releases/$release_id"
       fi
     fi
 
