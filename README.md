@@ -14,9 +14,9 @@ Deploy a pre-built images from ECR to heroku container registry.
 steps:
   - label: ":heroku: Deploy my-app app (web)"
     plugins:
-      - envato/heroku-container-deploy#v1.0.0:
+      - envato/heroku-container-deploy#v1.1.0:
           app: my-app
-          process-types:
+          process-type-images:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
 ```
 
@@ -26,9 +26,9 @@ Deploy multiple pre-built images from ECR to heroku container registry.
 steps:
   - label: ":heroku: Deploy my-app app (web and worker)"
     plugins:
-      - envato/heroku-container-deploy#v1.0.0:
+      - envato/heroku-container-deploy#v1.1.0:
           app: my-app
-          process-types:
+          process-type-images:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
             - worker:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker-${BUILDKITE_COMMIT}
 ```
@@ -39,9 +39,9 @@ Deploy multiple pre-built images including a [Release Phase](https://devcenter.h
 steps:
   - label: ":heroku: Deploy my-app app (web, worker and release)"
     plugins:
-      - envato/heroku-container-deploy#v1.0.0:
+      - envato/heroku-container-deploy#v1.1.0:
           app: my-app
-          process-types:
+          process-type-images:
             - web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web-${BUILDKITE_COMMIT}
             - worker:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker-${BUILDKITE_COMMIT}
             - release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release-${BUILDKITE_COMMIT}
@@ -55,13 +55,19 @@ Ensure that you have an `HEROKU_API_KEY` environment variable configured for you
 
 Heroku app name
 
-### `process-types` (Required, Array of string)
+### `process-type-images` (Required, Array of string)
 
 List of process types and their image repository to deploy.
 
 ```
 <proc-type>:<ecr>:<tag>
 ```
+
+### `releasing` (Optional, Array of string)
+
+List of process type names to be released. It will allays pull, tag and push all images, but it will only patch the Heroku Formation API with these images.
+
+Default: All process types in `process-type-images` except one named `migrations`
 
 ## Developing
 

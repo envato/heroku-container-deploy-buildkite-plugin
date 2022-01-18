@@ -57,13 +57,47 @@ function get_proc_type_image_tag() {
 }
 
 app=$(plugin_read_list APP)
-process_types=$(plugin_read_list PROCESS_TYPES)
+
+process_type_images=()
+
+if [[ -n "$(plugin_read_list PROCESS_TYPE_IMAGES)" ]]; then
+  for process_type_image in $(plugin_read_list PROCESS_TYPE_IMAGES); do
+    process_type_images+=("$process_type_image")
+  done
+fi
+
+if [ ${#process_type_images[@]} -eq 0 ]; then
+  # Deprecated process-types in favour of process-type-images
+  for process_type_image in $(plugin_read_list PROCESS_TYPES); do
+    process_type_images+=("$process_type_image")
+  done
+  echo "Deprecated Warning: Please use process-type-images instead"
+fi
+
+releasing=()
+
+if [[ -n "$(plugin_read_list RELEASING)" ]]; then
+  for image_name in $(plugin_read_list RELEASING); do
+    releasing+=("$image_name")
+  done
+fi
+
+# Defaults to releasing all proc types
+if [ ${#releasing[@]} -eq 0 ]; then
+  for line in "${process_type_images[@]}"; do
+    IFS=':' read -r -a tokens <<< "$line"
+    # Exclude an image called migrations by default
+    if [ "${tokens[0]}" != "migrations" ]; then
+      releasing+=("${tokens[0]}")
+    fi
+  done
+fi
 
 ##
 ## Pulling from owner container registry
 ##
 
-for line in $process_types; do
+for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
@@ -90,7 +124,7 @@ done
 ## Tagging for heroku container registry
 ##
 
-for line in $process_types; do
+for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
@@ -108,13 +142,13 @@ done
 echo "~~~ :heroku: Logging into Heroku Docker Registry"
 echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
 
-for line in $process_types; do
+for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
-  echo "~~~ :heroku: Pushing ${proc_type} image"
+  echo "~~~ :heroku: Pushing $app/$proc_type image"
   status=0
   if ! retry 3 docker push "$proc_type_tag"; then
     status=$((status + 1))
@@ -131,28 +165,32 @@ done
 ## Releasing to heroku platform
 ##
 
-proc_type_names=()
-for line in $process_types; do
-  IFS=':' read -r -a tokens <<< "$line"
-  proc_type=${tokens[0]}
-  proc_type_names+=("$proc_type")
-done
-
-echo "+++ :heroku: Releasing ${proc_type_names[*]}"
+echo "+++ :heroku: Releasing ${releasing[*]} for $app"
 
 updates=()
 
-for line in $process_types; do
+for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
   proc_type=${tokens[0]}
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
+
   # Based on https://devcenter.heroku.com/articles/container-registry-and-runtime#getting-a-docker-image-id
   image_id=$(docker inspect "$proc_type_tag" --format=\{\{.Id\}\})
 
-  echo "Inspected $proc_type_tag identified as $image_id"
-  updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
+  # shellcheck disable=SC2076
+  if [[ " ${releasing[*]} " =~ " ${proc_type} " ]]; then
+    echo "Inspected $proc_type_tag identified as $image_id"
+    updates+=("{\"type\":\"${proc_type}\",\"docker_image\":\"$image_id\"}")
+  else
+    echo "Skipping inspected $proc_type_tag identified as $image_id"
+  fi
 done
+
+if [ ${#updates[@]} -eq 0 ]; then
+  echo "There aren't images to release"
+  exit 0
+fi
 
 payload=$(join_by , "${updates[@]}")
 
@@ -166,8 +204,6 @@ curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
   -H "Authorization: Bearer ${HEROKU_API_KEY:-}" \
   -o /dev/null
-
-echo ""
 
 version=""
 
