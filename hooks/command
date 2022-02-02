@@ -48,8 +48,10 @@ retry() {
   return 0
 }
 
+heroku_registry_host="registry.heroku.com"
+
 function get_proc_type_image_tag() {
-  echo "registry.heroku.com/$app/$1:latest"
+  echo "$heroku_registry_host/$app/$1:latest"
 }
 
 key_name=$(plugin_read_list KEY_NAME)
@@ -108,7 +110,12 @@ for line in "${process_type_images[@]}"; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_image_id=$(docker images -q "$proc_type_image")
 
-  echo "~~~ :docker: Pulling $proc_type image"
+  emoji=":docker:"
+  if [[ "$proc_type_image" =~ $heroku_registry_host ]]; then
+    emoji=":heroku:"
+  fi
+
+  echo "~~~ $emoji Pulling $proc_type image"
   if [ -z "${proc_type_image_id}" ]; then
     status=0
     if ! retry 3 docker pull "$proc_type_image"; then
@@ -135,7 +142,7 @@ for line in "${process_type_images[@]}"; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
-  echo "~~~ :heroku: Tagging ${proc_type} image"
+  echo "~~~ :heroku: Tagging $app/${proc_type} image"
   docker tag "$proc_type_image" "$proc_type_tag"
   echo "Tagged $proc_type_image as $proc_type_tag"
 done
