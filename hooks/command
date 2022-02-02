@@ -101,6 +101,13 @@ if [ ${#releasing[@]} -eq 0 ]; then
 fi
 
 ##
+## Log in to the heroku registry early, in case the images are already there
+##
+
+echo "~~~ :heroku: Logging into Heroku Docker Registry"
+echo "$heroku_api_key" | docker login --username=_ --password-stdin registry.heroku.com
+
+##
 ## Pulling from owner container registry
 ##
 
@@ -150,9 +157,6 @@ done
 ##
 ## Pushing to heroku container registry
 ##
-
-echo "~~~ :heroku: Logging into Heroku Docker Registry"
-echo "$heroku_api_key" | docker login --username=_ --password-stdin registry.heroku.com
 
 for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
