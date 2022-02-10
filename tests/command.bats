@@ -454,6 +454,34 @@ load '/usr/local/lib/bats/load.bash'
   unstub docker
 }
 
+@test "Fails when docker login fails with specified key" {
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_1="release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_KEY_NAME=MY_HEROKU_KEY
+  export HEROKU_API_KEY=irrelevant
+  export MY_HEROKU_KEY=api-token
+
+  stub docker \
+    "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
+    "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
+    "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
+    "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
+    "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
+    "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
+    "login --username=_ --password-stdin registry.heroku.com : exit 1"
+
+  run "$PWD/hooks/command"
+
+  assert_failure
+  assert_output --partial "Pulled XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
+  assert_output --partial "Pulled XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
+  assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web as registry.heroku.com/my-app/web:latest"
+  assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release as registry.heroku.com/my-app/release:latest"
+
+  unstub docker
+}
+
 @test "Fails when an image push fails" {
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_1="release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
@@ -568,6 +596,15 @@ load '/usr/local/lib/bats/load.bash'
   run "$PWD/hooks/command"
 
   assert_failure
-  assert_output --partial "Missing required HEROKU_API_KEY"
+  assert_output --partial "Missing heroku api key. Required HEROKU_API_KEY or \"key-name\""
 }
 
+@test "Missing Heroku API Key when specified" {
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_KEY_NAME=MY_HEROKU_KEY
+  export HEROKU_API_KEY=irrelevant
+
+  run "$PWD/hooks/command"
+
+  assert_failure
+  assert_output --partial "Missing heroku api key. Required HEROKU_API_KEY or \"key-name\""
+}

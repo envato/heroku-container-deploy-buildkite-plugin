@@ -4,10 +4,6 @@ set -ue
 
 retry_sleep=${RETRY_SLEEP:-2}
 
-if [ -z "${HEROKU_API_KEY:-}" ]; then
-  echo "Missing required HEROKU_API_KEY"
-  exit 1
-fi
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
@@ -55,6 +51,15 @@ retry() {
 function get_proc_type_image_tag() {
   echo "registry.heroku.com/$app/$1:latest"
 }
+
+key_name=$(plugin_read_list KEY_NAME)
+key_name="${key_name:-HEROKU_API_KEY}"
+heroku_api_key=$(printf '%s\n' "${!key_name-}")
+
+if [ -z "${heroku_api_key}" ]; then
+  echo "Missing heroku api key. Required HEROKU_API_KEY or \"key-name\""
+  exit 1
+fi
 
 app=$(plugin_read_list APP)
 
@@ -140,7 +145,7 @@ done
 ##
 
 echo "~~~ :heroku: Logging into Heroku Docker Registry"
-echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+echo "$heroku_api_key" | docker login --username=_ --password-stdin registry.heroku.com
 
 for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
