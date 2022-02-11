@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -ue
+
+echo "~~~ :heroku: Logging out of Heroku Docker Registry"
+docker logout registry.heroku.com
