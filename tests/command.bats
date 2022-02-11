@@ -13,13 +13,13 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
@@ -52,14 +52,16 @@ load '/usr/local/lib/bats/load.bash'
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_1="release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
-  export HEROKU_API_KEY=api-token
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_KEY_NAME=MY_HEROKU_KEY
+  export HEROKU_API_KEY=irrelevant
+  export MY_HEROKU_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : echo web" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : echo release" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
@@ -94,9 +96,9 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : echo web" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
@@ -123,9 +125,9 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : echo web" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
@@ -156,6 +158,7 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker : exit 0" \
@@ -165,7 +168,6 @@ load '/usr/local/lib/bats/load.bash'
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-worker registry.heroku.com/my-app/worker:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations registry.heroku.com/my-app/migrations:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/worker:latest : exit 0" \
     "push registry.heroku.com/my-app/migrations:latest : exit 0" \
@@ -208,9 +210,9 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations : echo migrations" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations registry.heroku.com/my-app/migrations:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/migrations:latest : exit 0" \
     "inspect registry.heroku.com/my-app/migrations:latest --format={{.Id}} : echo migrations_id"
 
@@ -234,13 +236,13 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-migrations registry.heroku.com/my-app/migrations:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/migrations:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
@@ -276,9 +278,9 @@ load '/usr/local/lib/bats/load.bash'
   export RETRY_SLEEP=0
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : echo web" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
@@ -308,9 +310,9 @@ load '/usr/local/lib/bats/load.bash'
   export RETRY_SLEEP=0
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : echo web" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id"
 
@@ -340,9 +342,9 @@ load '/usr/local/lib/bats/load.bash'
   export RETRY_SLEEP=0
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : echo release" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 0" \
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : echo release_id"
 
@@ -375,9 +377,9 @@ load '/usr/local/lib/bats/load.bash'
   export RETRY_SLEEP=0
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : echo release" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 0" \
     "inspect registry.heroku.com/my-app/release:latest --format={{.Id}} : echo release_id"
 
@@ -412,6 +414,7 @@ load '/usr/local/lib/bats/load.bash'
   export RETRY_SLEEP=0
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
@@ -429,27 +432,31 @@ load '/usr/local/lib/bats/load.bash'
 }
 
 @test "Fails when docker login fails" {
-  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
-  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_1="release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
   export HEROKU_API_KEY=api-token
 
   stub docker \
-    "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
-    "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
-    "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
-    "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
-    "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
-    "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
     "login --username=_ --password-stdin registry.heroku.com : exit 1"
 
   run "$PWD/hooks/command"
 
   assert_failure
-  assert_output --partial "Pulled XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
-  assert_output --partial "Pulled XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
-  assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web as registry.heroku.com/my-app/web:latest"
-  assert_output --partial "Tagged XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release as registry.heroku.com/my-app/release:latest"
+
+  unstub docker
+}
+
+@test "Fails when docker login fails with specified key" {
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_KEY_NAME=MY_HEROKU_KEY
+  export HEROKU_API_KEY=irrelevant
+  export MY_HEROKU_KEY=api-token
+
+  stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 1"
+
+  run "$PWD/hooks/command"
+
+  assert_failure
 
   unstub docker
 }
@@ -462,13 +469,13 @@ load '/usr/local/lib/bats/load.bash'
   export RETRY_SLEEP=0
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 1" \
     "push registry.heroku.com/my-app/release:latest : exit 1" \
@@ -495,13 +502,13 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
@@ -533,13 +540,13 @@ load '/usr/local/lib/bats/load.bash'
   export HEROKU_API_KEY=api-token
 
   stub docker \
+    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web : exit 0" \
     "images -q XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "pull XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web registry.heroku.com/my-app/web:latest : exit 0" \
     "tag XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release registry.heroku.com/my-app/release:latest : exit 0" \
-    "login --username=_ --password-stdin registry.heroku.com : exit 0" \
     "push registry.heroku.com/my-app/web:latest : exit 0" \
     "push registry.heroku.com/my-app/release:latest : exit 0" \
     "inspect registry.heroku.com/my-app/web:latest --format={{.Id}} : echo web_id" \
@@ -568,6 +575,15 @@ load '/usr/local/lib/bats/load.bash'
   run "$PWD/hooks/command"
 
   assert_failure
-  assert_output --partial "Missing required HEROKU_API_KEY"
+  assert_output --partial "Missing heroku api key. Required HEROKU_API_KEY or \"key-name\""
 }
 
+@test "Missing Heroku API Key when specified" {
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_KEY_NAME=MY_HEROKU_KEY
+  export HEROKU_API_KEY=irrelevant
+
+  run "$PWD/hooks/command"
+
+  assert_failure
+  assert_output --partial "Missing heroku api key. Required HEROKU_API_KEY or \"key-name\""
+}

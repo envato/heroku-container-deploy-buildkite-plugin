@@ -49,11 +49,13 @@ steps:
 
 ## Configuration
 
-Ensure that you have an `HEROKU_API_KEY` environment variable configured for your agent/repo.
-
 ### `app` (Required, string)
 
 Heroku app name
+
+### `key-name` (Optional, string)
+
+The name of the environment variable that contains the Heroku API key. Defaults to `HEROKU_API_KEY`
 
 ### `process-type-images` (Required, Array of string)
 

@@ -4,10 +4,6 @@ set -ue
 
 retry_sleep=${RETRY_SLEEP:-2}
 
-if [ -z "${HEROKU_API_KEY:-}" ]; then
-  echo "Missing required HEROKU_API_KEY"
-  exit 1
-fi
 
 function join_by { local IFS="$1"; shift; echo "$*"; }
 
@@ -52,9 +48,20 @@ retry() {
   return 0
 }
 
+heroku_registry_host="registry.heroku.com"
+
 function get_proc_type_image_tag() {
-  echo "registry.heroku.com/$app/$1:latest"
+  echo "$heroku_registry_host/$app/$1:latest"
 }
+
+key_name=$(plugin_read_list KEY_NAME)
+key_name="${key_name:-HEROKU_API_KEY}"
+heroku_api_key=$(printf '%s\n' "${!key_name-}")
+
+if [ -z "${heroku_api_key}" ]; then
+  echo "Missing heroku api key. Required HEROKU_API_KEY or \"key-name\""
+  exit 1
+fi
 
 app=$(plugin_read_list APP)
 
@@ -94,6 +101,13 @@ if [ ${#releasing[@]} -eq 0 ]; then
 fi
 
 ##
+## Log in to the heroku registry early, in case the images are already there
+##
+
+echo "~~~ :heroku: Logging into Heroku Docker Registry"
+echo "$heroku_api_key" | docker login --username=_ --password-stdin registry.heroku.com
+
+##
 ## Pulling from owner container registry
 ##
 
@@ -103,7 +117,12 @@ for line in "${process_type_images[@]}"; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_image_id=$(docker images -q "$proc_type_image")
 
-  echo "~~~ :docker: Pulling $proc_type image"
+  emoji=":docker:"
+  if [[ "$proc_type_image" =~ $heroku_registry_host ]]; then
+    emoji=":heroku:"
+  fi
+
+  echo "~~~ $emoji Pulling $proc_type image"
   if [ -z "${proc_type_image_id}" ]; then
     status=0
     if ! retry 3 docker pull "$proc_type_image"; then
@@ -130,7 +149,7 @@ for line in "${process_type_images[@]}"; do
   proc_type_image=$(IFS=':'; echo "${tokens[*]:1}")
   proc_type_tag=$(get_proc_type_image_tag "$proc_type")
 
-  echo "~~~ :heroku: Tagging ${proc_type} image"
+  echo "~~~ :heroku: Tagging $app/${proc_type} image"
   docker tag "$proc_type_image" "$proc_type_tag"
   echo "Tagged $proc_type_image as $proc_type_tag"
 done
@@ -138,9 +157,6 @@ done
 ##
 ## Pushing to heroku container registry
 ##
-
-echo "~~~ :heroku: Logging into Heroku Docker Registry"
-echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
 
 for line in "${process_type_images[@]}"; do
   IFS=':' read -r -a tokens <<< "$line"
@@ -202,7 +218,7 @@ curl -sf -X PATCH "https://api.heroku.com/apps/$app/formation" \
   -d "{\"updates\":[$payload]}" \
   -H "Content-Type: application/json" \
   -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
-  -H "Authorization: Bearer ${HEROKU_API_KEY:-}" \
+  -H "Authorization: Bearer ${heroku_api_key:-}" \
   -o /dev/null
 
 version=""
@@ -221,7 +237,7 @@ function check_release() {
       -H "Content-Type: application/json" \
       -H "Accept: application/vnd.heroku+json; version=3" \
       -H "Range: version ..; max=1, order=desc" \
-      -H "Authorization: Bearer ${HEROKU_API_KEY:-}")
+      -H "Authorization: Bearer ${heroku_api_key:-}")
 
     version=$(echo "$latest_release" | jq -r '.[0].version')
     local current; current=$(echo "$latest_release" | jq -r '.[0].current')

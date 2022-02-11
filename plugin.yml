@@ -9,6 +9,8 @@ configuration:
   properties:
     app:
       type: string
+    key-name:
+      type: string
     process-types:
       type: [string, array]
       minimum: 1
