@@ -52,7 +52,9 @@ load '/usr/local/lib/bats/load.bash'
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_0="web:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-web"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_PROCESS_TYPE_IMAGES_1="release:XXXXXXXXXXXX.dkr.ecr.us-east-1.amazonaws.com/my-repo:heroku-release"
   export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_APP=my-app
-  export HEROKU_API_KEY=api-token
+  export BUILDKITE_PLUGIN_HEROKU_CONTAINER_DEPLOY_KEY_NAME=MY_HEROKU_KEY
+  export HEROKU_API_KEY=irrelevant
+  export MY_HEROKU_KEY=api-token
 
   stub docker \
     "login --username=_ --password-stdin registry.heroku.com : exit 0" \
