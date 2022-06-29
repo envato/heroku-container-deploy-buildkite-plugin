@@ -289,4 +289,4 @@ function check_release() {
 
 check_release
 
-echo "Version $version is current."
+echo "$(date) Version $version is current."
